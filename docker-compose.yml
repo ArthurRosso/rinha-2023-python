@@ -8,7 +8,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.50'
           memory: '0.5GB'
     depends_on:
       - db
@@ -20,7 +20,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.50'
           memory: '0.5GB'
     depends_on:
       - db
@@ -54,7 +54,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
+          cpus: '0.25'
           memory: '1.5GB'
 
 volumes:

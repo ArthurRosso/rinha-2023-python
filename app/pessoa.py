@@ -1,4 +1,5 @@
 import uuid
+from fastapi.encoders import jsonable_encoder
 from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -8,6 +9,7 @@ from sqlalchemy import select, func
 from model import Pessoa as db_pessoa
 from schema import Pessoa as sc_pessoa
 from schema import PessoaPayload as sc_pessoa_payload
+from fastapi.responses import JSONResponse
 
 from database import get_db_session
 
@@ -17,7 +19,7 @@ router = APIRouter()
 async def criar_pessoa(
     pessoa_payload: sc_pessoa_payload,
     session: AsyncSession = Depends(get_db_session),
-) -> sc_pessoa:
+) -> JSONResponse:
     # Verificar se já existe uma Pessoa com o mesmo nome ou apelido
     query = select(db_pessoa).where(
         (db_pessoa.apelido == pessoa_payload.apelido) |
@@ -38,7 +40,12 @@ async def criar_pessoa(
     session.add(pessoa)
     await session.commit()
     await session.refresh(pessoa)
-    return sc_pessoa.model_validate(pessoa)
+
+    return JSONResponse(
+        content=jsonable_encoder(sc_pessoa.model_validate(pessoa)),
+        status_code=status.HTTP_201_CREATED, 
+        headers={"Location": f"/pessoas/{pessoa.id}"}
+    )
 
 @router.get("/pessoas/{id}", status_code=status.HTTP_200_OK)
 async def consulta_pessoa(
