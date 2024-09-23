@@ -3,24 +3,28 @@ services:
   api1:
     build: .
     hostname: api1
+    # ports:
+    #   - "8000:8000"
     expose:
-      - "8000"
+      - 8000
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: '0.4'
           memory: '0.5GB'
     depends_on:
       - db
   api2:
     build: .
     hostname: api2
+    # ports:
+    #   - "8001:8000"
     expose:
-      - "8000"
+      - 8000
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: '0.4'
           memory: '0.5GB'
     depends_on:
       - db
@@ -37,24 +41,25 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.1'
           memory: '0.5GB'
 
   db:
-    image: postgres:16
+    image: postgres
+    hostname: db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.conf
+    command: postgres -c config_file=/docker-entrypoint-initdb.d/postgresql.conf
     expose:
       - 5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-      - POSTGRES_PORT=5432
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.6'
           memory: '1.5GB'
 
 volumes:

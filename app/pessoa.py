@@ -1,4 +1,5 @@
 import uuid
+import json
 from fastapi.encoders import jsonable_encoder
 from typing import Union
 
@@ -34,9 +35,19 @@ async def criar_pessoa(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Uma Pessoa com o mesmo apelido ou nome já exite"
         )
+    
+    pessoa_data = {
+        "apelido": pessoa_payload.apelido,
+        "nome": pessoa_payload.nome,
+        "nascimento": pessoa_payload.nascimento,
+        # Convert the stack list to a JSON string
+        "stack": json.dumps(pessoa_payload.stack) if pessoa_payload.stack else None
+    }
+
+    print(pessoa_data)
 
     # Inserir a nova Pessoa na base de dados
-    pessoa = db_pessoa(**pessoa_payload.model_dump())
+    pessoa = db_pessoa(**pessoa_data)
     session.add(pessoa)
     await session.commit()
     await session.refresh(pessoa)
@@ -76,7 +87,7 @@ async def busca_pessoa(
         )
     
     query = select(db_pessoa).where(
-        db_pessoa.apelido.contains(t) | db_pessoa.nome.contains(t)
+        db_pessoa.apelido.contains(t) | db_pessoa.nome.contains(t) | db_pessoa.stack.contains(t)
     )
     
     result = await session.execute(query)

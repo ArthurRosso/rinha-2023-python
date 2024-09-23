@@ -11,7 +11,7 @@ class Pessoa(BaseModel):
     apelido: str
     nome: str
     nascimento: date
-    stack: Optional[list[str]]
+    stack: Optional[str]
 
 class PessoaPayload(BaseModel):
     model_config = ConfigDict(from_attributes=True)
